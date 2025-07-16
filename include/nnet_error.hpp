@@ -21,6 +21,11 @@ namespace nnet
 		internalError (const std::string &what_arg) : error(what_arg) {}
 	};
 
+	struct usageError : error
+	{
+		usageError (const std::string &what_arg) : error(what_arg) {}
+	};
+
 }
 
 

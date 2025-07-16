@@ -8,6 +8,23 @@ nnet::neural::neural (int middleLayerCount, int inputNodeCount, int middleNodeCo
 	m_outputNodeCount {outputNodeCount}
 {
 
+	if (middleLayerCount < 0)
+	{
+		throw nnet::usageError("Middle layer count must be >= 0");
+	}
+	if (inputNodeCount < 1)
+	{
+		throw nnet::usageError("Input node count must be >= 1");
+	}
+	if (middleNodeCount < 1)
+	{
+		throw nnet::usageError("Middle node count must be >= 1");
+	}
+	if (outputNodeCount < 1)
+	{
+		throw nnet::usageError("Output node count must be >= 1");
+	}
+
 	regenUID();
 
 	std::shared_ptr<layer> inpLayer = std::make_shared<layer>(inputNodeCount);
@@ -32,13 +49,13 @@ nnet::neural::neural (int middleLayerCount, int inputNodeCount, int middleNodeCo
 
 
 
-std::unique_ptr<nnet::neural> nnet::neural::makeCopy ()
+
+nnet::neural* nnet::neural::makeCopy_ ()
 {
 
-	std::unique_ptr<neural> copiedNeural(new neural(*this));
+	neural* copiedNeural = new neural(*this);
 
 	copiedNeural->regenUID();
-
 
 	for (int i = 0; i < copiedNeural->layers.size(); ++i)
 	{
@@ -64,6 +81,18 @@ std::unique_ptr<nnet::neural> nnet::neural::makeCopy ()
 	return copiedNeural;
 
 }
+
+
+std::unique_ptr<nnet::neural> nnet::neural::makeCopy_u ()
+{
+	return std::unique_ptr<neural>(makeCopy_());
+}
+
+std::shared_ptr<nnet::neural> nnet::neural::makeCopy_s ()
+{
+	return std::shared_ptr<neural>(makeCopy_());
+}
+
 
 
 

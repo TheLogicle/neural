@@ -27,7 +27,8 @@ namespace nnet
 			std::string getUID ();
 
 			// use verbose makeCopy method to copy a neural network
-			std::unique_ptr<neural> makeCopy ();
+			std::unique_ptr<neural> makeCopy_u ();
+			std::shared_ptr<neural> makeCopy_s ();
 
 			std::vector<std::shared_ptr<layer>> layers;
 
@@ -71,6 +72,7 @@ namespace nnet
 		private:
 			neural (const neural&) = default;
 			neural& operator = (const neural&) = default;
+			neural* makeCopy_ ();
 
 	};
 
