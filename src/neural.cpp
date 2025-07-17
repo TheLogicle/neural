@@ -48,6 +48,10 @@ nnet::neural::neural (int middleLayerCount, int inputNodeCount, int middleNodeCo
 }
 
 
+std::string nnet::neural::getUID ()
+{
+	return m_UID;
+}
 
 
 nnet::neural* nnet::neural::makeCopy_ ()
