@@ -135,6 +135,27 @@ void nnet::neural::tweak (float magnitude)
 }
 
 
+void nnet::neural::backprop (float learningRate, std::vector<float> ideal)
+{
+
+	for (int i = 1; i < layers.size(); ++i)
+	{
+		layers.at(i)->resetVitalCache();
+	}
+
+
+	outputLayer->backprop(learningRate, ideal);
+
+	// iterate backwards through all middle layers
+	for (int i = layers.size() - 2; i >= 1; --i)
+	{
+		layers.at(i)->backprop(learningRate);
+	}
+
+}
+
+
+
 void nnet::neural::zeroInput ()
 {
 
