@@ -1,7 +1,7 @@
 #include "../include/nnet.hpp"
 
 
-float randFloat ()
+float nnet::randFloat ()
 {
 	return ((float) rand()) / RAND_MAX;
 }
