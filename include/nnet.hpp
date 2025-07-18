@@ -14,6 +14,9 @@ namespace nnet
 	// wrapper for the builtin rand() function
 	float randFloat ();
 
+	// get endianness of current system
+	bool isLittleEndian ();
+
 
 
 	struct layer;
@@ -29,9 +32,18 @@ namespace nnet
 			// call this function to retrieve it
 			std::string getUID ();
 
+
+
 			// use verbose makeCopy method to copy a neural network
-			std::unique_ptr<neural> makeCopy_u ();
-			std::shared_ptr<neural> makeCopy_s ();
+			// returns a pointer to the copy, which is allocated with the "new" keyword
+			neural* makeCopy ();
+
+			// functions to save and load to/from a file
+			bool saveToFile (std::string filename);
+			// this returns a pointer to an object allocated with the "new" keyword
+			static neural* loadFromFile (std::string filename);
+
+
 
 			std::vector<std::shared_ptr<layer>> layers;
 
@@ -66,6 +78,7 @@ namespace nnet
 			int selectOutputFixed ();
 
 
+
 		// UID
 		private:
 			std::string m_UID;
@@ -85,7 +98,6 @@ namespace nnet
 		private:
 			neural (const neural&) = default;
 			neural& operator = (const neural&) = default;
-			neural* makeCopy_ ();
 
 	};
 

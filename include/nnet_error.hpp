@@ -30,6 +30,12 @@ namespace nnet
 		usageError (const std::string &what_arg) : error(what_arg) {}
 	};
 
+	// to be thrown when saving/loading files is not supported because the machine uses different primitive type sizes
+	struct incompatibleError : error
+	{
+		incompatibleError (const std::string &what_arg) : error(what_arg) {}
+	};
+
 }
 
 

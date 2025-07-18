@@ -1,9 +1,18 @@
 #include "../include/nnet.hpp"
 
+#include <cstdint>
+
 
 float nnet::randFloat ()
 {
 	return ((float) rand()) / RAND_MAX;
+}
+
+
+bool nnet::isLittleEndian ()
+{
+	uint16_t a = 1;
+	return *(uint8_t*) &a;
 }
 
 

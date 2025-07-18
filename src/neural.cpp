@@ -54,7 +54,7 @@ std::string nnet::neural::getUID ()
 }
 
 
-nnet::neural* nnet::neural::makeCopy_ ()
+nnet::neural* nnet::neural::makeCopy ()
 {
 
 	neural* copiedNeural = new neural(*this);
@@ -86,16 +86,6 @@ nnet::neural* nnet::neural::makeCopy_ ()
 
 }
 
-
-std::unique_ptr<nnet::neural> nnet::neural::makeCopy_u ()
-{
-	return std::unique_ptr<neural>(makeCopy_());
-}
-
-std::shared_ptr<nnet::neural> nnet::neural::makeCopy_s ()
-{
-	return std::shared_ptr<neural>(makeCopy_());
-}
 
 
 
