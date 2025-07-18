@@ -119,7 +119,7 @@ void inline nnet::node::activate ()
 	value = tanh(value);
 }
 
-float inline nnet::node::cost (float ideal)
+float nnet::node::cost (float ideal)
 {
 	return (value - ideal) * (value - ideal);
 }

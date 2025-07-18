@@ -115,7 +115,7 @@ namespace nnet
 		void backprop (float learningRate, bool isOutputNode, float ideal = 0);
 
 		void inline activate ();
-		float inline cost (float ideal);
+		float cost (float ideal);
 		// this function should ONLY be called by the output layer nodes!!!
 		float inline dCost_dValue (float ideal);
 		// derivative of activation function
