@@ -146,12 +146,12 @@ void nnet::neural::backprop (float learningRate, std::vector<float> ideal)
 
 
 
-void nnet::neural::zeroInput ()
+void nnet::neural::clearInput (float value)
 {
 
 	for (node &n: inputLayer->nodes)
 	{
-		n.value = 0;
+		n.value = value;
 	}
 
 }

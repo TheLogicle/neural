@@ -63,8 +63,8 @@ namespace nnet
 			void backprop (float learningRate, std::vector<float> ideal);
 
 
-			// set all input nodes to zero
-			void zeroInput ();
+			// set all input nodes to value
+			void clearInput (float value);
 
 
 			// either of these selectOutput() functions should be run AFTER calculate()
