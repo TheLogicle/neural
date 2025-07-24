@@ -61,6 +61,9 @@ namespace nnet
 
 			// backprop, given an ideal output
 			void backprop (float learningRate, std::vector<float> ideal);
+			// get current cost value
+			float cost (std::vector<float> ideal);
+
 
 
 			// set all input nodes to value

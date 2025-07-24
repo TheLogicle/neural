@@ -146,6 +146,22 @@ void nnet::neural::backprop (float learningRate, std::vector<float> ideal)
 
 
 
+float nnet::neural::cost (std::vector<float> ideal)
+{
+	float costSum = 0;
+
+	for (int i = 0; i < outputLayer->nodes.size(); ++i)
+	{
+		node &n = outputLayer->nodes.at(i);
+
+		costSum += n.cost(ideal.at(i));
+	}
+
+	return costSum;
+}
+
+
+
 void nnet::neural::clearInput (float value)
 {
 
