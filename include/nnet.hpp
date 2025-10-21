@@ -60,7 +60,13 @@ namespace nnet
 
 
 			// backprop, given an ideal output
-			void backprop (float learningRate, std::vector<float> ideal);
+			// set "accumulate" to true to average over a minibatch, then call backpropApply()
+			void backprop (bool accumulate, float learningRate, std::vector<float> ideal);
+			void backpropApply ();
+
+			// backprop function uses this variable to keep track of how many datasets are in a batch
+			int trainDataCount = 0;
+
 			// get current cost value
 			float cost (std::vector<float> ideal);
 
@@ -127,7 +133,12 @@ namespace nnet
 
 		////// backprop calculation
 		// "ideal" argument is only used if "isOutputNode" is true
-		void backprop (float learningRate, bool isOutputNode, float ideal = 0);
+		void backprop (bool accumulate, float learningRate, bool isOutputNode, float ideal = 0);
+
+
+		// call this after processing a minibatch, to actually apply the nudges
+		void backpropApply (int trainDataCount);
+
 
 		void inline activate ();
 		float cost (float ideal);
@@ -150,6 +161,10 @@ namespace nnet
 		const float dUnactivated_dBias_ = 1;
 		float dUnactivated_dPrevValue_ = 0;
 
+		////// backprop nudge sums (for minibatch averaging)
+		std::vector<float> weightNudgeSums;
+		float biasNudgeSum = 0;
+
 	};
 
 
@@ -166,9 +181,12 @@ namespace nnet
 		void tweak (float magnitude);
 
 		// use this for the output layer
-		void backprop (float learningRate, std::vector<float> ideal);
+		void backprop (bool accumulate, float learningRate, std::vector<float> ideal);
 		// use this for all middle layers
-		void backprop (float learningRate);
+		void backprop (bool accumulate, float learningRate);
+
+		// call this after processing a minibatch, to actually apply the nudges
+		void backpropApply (int trainDataCount);
 
 		void resetVitalCache ();
 

@@ -125,8 +125,20 @@ void nnet::neural::tweak (float magnitude)
 }
 
 
-void nnet::neural::backprop (float learningRate, std::vector<float> ideal)
+void nnet::neural::backprop (bool accumulate, float learningRate, std::vector<float> ideal)
 {
+
+	// backprop cache doesn't need to be reset every time if processing a minibatch
+	// also, update trainDataCount variable
+	if (accumulate)
+	{
+		++trainDataCount;
+	}
+	else
+	{
+		trainDataCount = 0;
+	}
+
 
 	for (int i = 1; i < layers.size(); ++i)
 	{
@@ -134,15 +146,32 @@ void nnet::neural::backprop (float learningRate, std::vector<float> ideal)
 	}
 
 
-	outputLayer->backprop(learningRate, ideal);
+	outputLayer->backprop(accumulate, learningRate, ideal);
 
 	// iterate backwards through all middle layers
 	for (int i = layers.size() - 2; i >= 1; --i)
 	{
-		layers.at(i)->backprop(learningRate);
+		layers.at(i)->backprop(accumulate, learningRate);
 	}
 
 }
+
+
+void nnet::neural::backpropApply ()
+{
+
+	for (int i = 1; i < layers.size(); ++i)
+	{
+		layers.at(i)->backpropApply(trainDataCount);
+
+		// technically, this operation isn't needed, but it's good for formality
+		layers.at(i)->resetVitalCache();
+	}
+
+	trainDataCount = 0;
+
+}
+
 
 
 

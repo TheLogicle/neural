@@ -10,7 +10,10 @@ nnet::node::node (std::weak_ptr<layer> _prevLayer)
 
 	if (prevLayerLock)
 	{
-		weights = std::vector<float>(prevLayerLock->nodes.size());
+		const int count = prevLayerLock->nodes.size();
+
+		weights = std::vector<float>(count);
+		weightNudgeSums = std::vector<float>(count, 0);
 	}
 
 }
@@ -73,7 +76,7 @@ void nnet::node::tweak (float magnitude)
 ////// backprop functions
 
 // make sure to call calculate() before this!
-void nnet::node::backprop (float learningRate, bool isOutputNode, float ideal)
+void nnet::node::backprop (bool accumulate, float learningRate, bool isOutputNode, float ideal)
 {
 
 	if (isOutputNode)
@@ -85,7 +88,15 @@ void nnet::node::backprop (float learningRate, bool isOutputNode, float ideal)
 
 	// nudge the bias
 	float dCost_dBias = dCost_dValue_ * dValue_dUnactivated() * dUnactivated_dBias();
-	bias -= learningRate * dCost_dBias;
+	float delta = learningRate * dCost_dBias;
+	if (accumulate)
+	{
+		biasNudgeSum -= delta;
+	}
+	else
+	{
+		bias -= delta;
+	}
 
 
 	std::shared_ptr<layer> prevLayerLock = prevLayer.lock();
@@ -99,7 +110,15 @@ void nnet::node::backprop (float learningRate, bool isOutputNode, float ideal)
 	{
 		// nudge the weights
 		float dCost_dWeight = dCost_dValue_ * dValue_dUnactivated_ * dUnactivated_dWeight(prevLayerLock, i);
-		weights.at(i) -= learningRate * dCost_dWeight;
+		float delta = learningRate * dCost_dWeight;
+		if (accumulate)
+		{
+			weightNudgeSums.at(i) -= delta;
+		}
+		else
+		{
+			weights.at(i) -= delta;
+		}
 
 
 		// nudge the dCost_dValue of the L-1 layer nodes
@@ -108,6 +127,22 @@ void nnet::node::backprop (float learningRate, bool isOutputNode, float ideal)
 		prevLayerLock->nodes.at(i).dCost_dValue_ += dCost_dPrevValue;
 	}
 
+
+}
+
+
+
+void nnet::node::backpropApply (int trainDataCount)
+{
+
+	bias += biasNudgeSum / trainDataCount;
+	biasNudgeSum = 0;
+
+	for (int i = 0; i < weights.size(); ++i)
+	{
+		weights.at(i) += weightNudgeSums.at(i) / trainDataCount;
+		weightNudgeSums.at(i) = 0;
+	}
 
 }
 
