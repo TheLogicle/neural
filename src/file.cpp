@@ -100,9 +100,9 @@ bool nnet::neural::saveToFile (std::string filename)
 
 			node &n = l->nodes.at(j);
 
-			for (int k = 0; k < n.weights.size(); ++k)
+			for (int k = 0; k < n.weights->size(); ++k)
 			{
-				float weight = n.weights.at(k);
+				float weight = n.weights->at(k);
 
 				serializePush<float>(buf, weight, isBigEndian);
 			}
@@ -137,7 +137,6 @@ bool nnet::neural::saveToFile (std::string filename)
 
 }
 
-#include <iostream>
 
 nnet::neural* nnet::neural::loadFromFile(std::string filename)
 {
@@ -178,9 +177,9 @@ nnet::neural* nnet::neural::loadFromFile(std::string filename)
 		{
 			node &n = l->nodes.at(j);
 
-			for (int k = 0; k < n.weights.size(); ++k)
+			for (int k = 0; k < n.weights->size(); ++k)
 			{
-				n.weights.at(k) = deserializePop<float>(buf, isBigEndian);
+				n.weights->at(k) = deserializePop<float>(buf, isBigEndian);
 			}
 		}
 	}

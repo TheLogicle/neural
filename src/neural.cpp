@@ -53,8 +53,12 @@ std::string nnet::neural::getUID ()
 	return m_UID;
 }
 
-
 nnet::neural* nnet::neural::makeCopy ()
+{
+	return makeCopy_m(true);
+}
+
+nnet::neural* nnet::neural::makeCopy_m (bool copyWeights)
 {
 
 	neural* copiedNeural = new neural(*this);
@@ -69,18 +73,23 @@ nnet::neural* nnet::neural::makeCopy ()
 		copiedNeural->layers.at(i) = copiedLayer;
 
 
-		// fix the prevLayer pointers for all layers (except first layer)
 		if (i == 0) continue;
 
 		for (node &n: copiedLayer->nodes)
 		{
+			// fix the prevLayer pointers for all layers (except first layer)
 			n.prevLayer = copiedNeural->layers.at(i - 1);
+
+			// also copy the weights
+			if (copyWeights) n.weights = std::make_shared<std::vector<float>>(*n.weights);
 		}
 
 	}
 
 	copiedNeural->inputLayer = copiedNeural->layers.front();
 	copiedNeural->outputLayer = copiedNeural->layers.back();
+
+	copiedNeural->backpropClear();
 
 	return copiedNeural;
 
@@ -172,6 +181,16 @@ void nnet::neural::backpropApply ()
 
 }
 
+
+void nnet::neural::backpropClear ()
+{
+	for (int i = 1; i < layers.size(); ++i)
+	{
+		layers.at(i)->backpropClear();
+	}
+
+	trainDataCount = 0;
+}
 
 
 

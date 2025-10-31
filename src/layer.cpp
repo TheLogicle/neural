@@ -2,9 +2,7 @@
 
 nnet::layer::layer (int nodeCount, std::weak_ptr<layer> prevLayer)
 {
-
 	nodes = std::vector<node>(nodeCount, {prevLayer});
-
 }
 
 
@@ -64,12 +62,19 @@ void nnet::layer::backprop (bool accumulate, float learningRate)
 
 void nnet::layer::backpropApply (int trainDataCount)
 {
-
 	for (node &n: nodes)
 	{
 		n.backpropApply(trainDataCount);
 	}
+}
 
+
+void nnet::layer::backpropClear ()
+{
+	for (node &n: nodes)
+	{
+		n.backpropClear();
+	}
 }
 
 

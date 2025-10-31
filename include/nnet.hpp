@@ -64,6 +64,14 @@ namespace nnet
 			void backprop (bool accumulate, float learningRate, std::vector<float> ideal);
 			void backpropApply ();
 
+			// merge backprop accumulation from another neural object
+			void backpropMergeFrom (neural& other);
+			// same as makeCopy, but point to same underlying weight data
+			neural* split ();
+
+			// clear the backprop accumulation data without applying it
+			void backpropClear ();
+
 			// backprop function uses this variable to keep track of how many datasets are in a batch
 			int trainDataCount = 0;
 
@@ -103,10 +111,15 @@ namespace nnet
 			int m_outputNodeCount;
 
 
-		// these are to be used only by the public makeCopy method
 		private:
+			// these are to be used only by the public makeCopy method
+			neural* makeCopy_m (bool copyWeights);
 			neural (const neural&) = default;
-			neural& operator = (const neural&) = default;
+			neural& operator= (const neural&) = default;
+
+			// move methods aren't needed right now, but I'll implement them if necessary
+			neural (neural&&) = delete;
+			neural& operator= (neural&&) = delete;
 
 	};
 
@@ -119,7 +132,7 @@ namespace nnet
 		// pointer to previous layer, so that this node can calculate what its value should be
 		std::weak_ptr<layer> prevLayer; 
 
-		std::vector<float> weights;
+		std::shared_ptr<std::vector<float>> weights;
 		float bias = 0;
 
 		// see the descriptions in class neural{} for what these functions do
@@ -139,6 +152,9 @@ namespace nnet
 		// call this after processing a minibatch, to actually apply the nudges
 		void backpropApply (int trainDataCount);
 
+		// clear the backprop accumulation data without applying it
+		void backpropClear ();
+
 
 		void inline activate ();
 		float cost (float ideal);
@@ -156,10 +172,7 @@ namespace nnet
 
 
 		////// backprop cache data
-		float dCost_dValue_ = 0; // this value is affected from outside
-		float dValue_dUnactivated_ = 0;
-		const float dUnactivated_dBias_ = 1;
-		float dUnactivated_dPrevValue_ = 0;
+		float dCost_dValue_ = 0; // this value is affected from outside this node
 
 		////// backprop nudge sums (for minibatch averaging)
 		std::vector<float> weightNudgeSums;
@@ -187,6 +200,9 @@ namespace nnet
 
 		// call this after processing a minibatch, to actually apply the nudges
 		void backpropApply (int trainDataCount);
+
+		// clear the backprop accumulation data without applying it
+		void backpropClear ();
 
 		void resetVitalCache ();
 

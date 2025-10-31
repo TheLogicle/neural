@@ -12,8 +12,13 @@ nnet::node::node (std::weak_ptr<layer> _prevLayer)
 	{
 		const int count = prevLayerLock->nodes.size();
 
-		weights = std::vector<float>(count);
+		weights = std::make_shared<std::vector<float>>(count);
 		weightNudgeSums = std::vector<float>(count, 0);
+
+		if (!weights)
+		{
+			throw nnet::internalError("error initializing weight list, thrown from nnet::node::node()");
+		}
 	}
 
 }
@@ -28,7 +33,7 @@ void nnet::node::calculate ()
 	{
 		throw nnet::internalError("could not access previous layer, thrown from nnet::node::calculate()");
 	}
-	if (prevLayerLock->nodes.size() != weights.size())
+	if (prevLayerLock->nodes.size() != weights->size())
 	{
 		throw nnet::internalError("previous layer node count and this node's weight count do not match");
 	}
@@ -36,9 +41,9 @@ void nnet::node::calculate ()
 
 	value = bias;
 
-	for (int i = 0; i < weights.size(); ++i)
+	for (int i = 0; i < weights->size(); ++i)
 	{
-		value += weights.at(i) * prevLayerLock->nodes.at(i).value;
+		value += weights->at(i) * prevLayerLock->nodes.at(i).value;
 	}
 
 	activate();
@@ -51,9 +56,9 @@ void nnet::node::randomize ()
 
 	bias = 2 * randFloat() - 1;
 
-	for (int i = 0; i < weights.size(); ++i)	
+	for (int i = 0; i < weights->size(); ++i)
 	{
-		weights.at(i) = 2 * randFloat() - 1;
+		weights->at(i) = 2 * randFloat() - 1;
 	}
 
 }
@@ -63,9 +68,9 @@ void nnet::node::tweak (float magnitude)
 
 	bias += magnitude * (2 * randFloat() - 1);
 
-	for (int i = 0; i < weights.size(); ++i)
+	for (int i = 0; i < weights->size(); ++i)
 	{
-		weights.at(i) += magnitude * (2 * randFloat() - 1);
+		weights->at(i) += magnitude * (2 * randFloat() - 1);
 	}
 
 }
@@ -87,7 +92,8 @@ void nnet::node::backprop (bool accumulate, float learningRate, bool isOutputNod
 
 
 	// nudge the bias
-	float dCost_dBias = dCost_dValue_ * dValue_dUnactivated() * dUnactivated_dBias();
+	float dValue_dUnactivated_ = dValue_dUnactivated();
+	float dCost_dBias = dCost_dValue_ * dValue_dUnactivated_ * dUnactivated_dBias();
 	float delta = learningRate * dCost_dBias;
 	if (accumulate)
 	{
@@ -106,7 +112,7 @@ void nnet::node::backprop (bool accumulate, float learningRate, bool isOutputNod
 		throw nnet::internalError("could not access previous layer, thrown from nnet::node::backprop()");
 	}
 
-	for (int i = 0; i < weights.size(); ++i)
+	for (int i = 0; i < weights->size(); ++i)
 	{
 		// nudge the weights
 		float dCost_dWeight = dCost_dValue_ * dValue_dUnactivated_ * dUnactivated_dWeight(prevLayerLock, i);
@@ -117,7 +123,7 @@ void nnet::node::backprop (bool accumulate, float learningRate, bool isOutputNod
 		}
 		else
 		{
-			weights.at(i) -= delta;
+			weights->at(i) -= delta;
 		}
 
 
@@ -138,12 +144,23 @@ void nnet::node::backpropApply (int trainDataCount)
 	bias += biasNudgeSum / trainDataCount;
 	biasNudgeSum = 0;
 
-	for (int i = 0; i < weights.size(); ++i)
+	for (int i = 0; i < weights->size(); ++i)
 	{
-		weights.at(i) += weightNudgeSums.at(i) / trainDataCount;
+		weights->at(i) += weightNudgeSums.at(i) / trainDataCount;
 		weightNudgeSums.at(i) = 0;
 	}
 
+}
+
+
+void nnet::node::backpropClear ()
+{
+	biasNudgeSum = 0;
+
+	for (float &f: weightNudgeSums)
+	{
+		f = 0;
+	}
 }
 
 
@@ -167,7 +184,7 @@ float inline nnet::node::dCost_dValue (float ideal)
 // derivative of activation function
 float inline nnet::node::dValue_dUnactivated ()
 {
-	return dValue_dUnactivated_ = 1 / (cosh(value) * cosh(value));
+	return 1 / (cosh(value) * cosh(value));
 }
 
 // even though the node stores a weak_ptr to the previous layer, this takes a shared_ptr as an optimization
@@ -184,7 +201,7 @@ float constexpr nnet::node::dUnactivated_dBias ()
 
 float inline nnet::node::dUnactivated_dPrevValue (int prevNodeInd)
 {
-	return dUnactivated_dPrevValue_ = weights.at(prevNodeInd);
+	return weights->at(prevNodeInd);
 }
 
 
