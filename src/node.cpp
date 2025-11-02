@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <iostream>
-
 nnet::node::node (std::weak_ptr<layer> _prevLayer)
 : prevLayer {_prevLayer}
 {

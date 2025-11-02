@@ -2,7 +2,14 @@
 
 nnet::layer::layer (int nodeCount, std::weak_ptr<layer> prevLayer)
 {
-	nodes = std::vector<node>(nodeCount, {prevLayer});
+
+	nodes.reserve(nodeCount);
+
+	for (int i = 0; i < nodeCount; ++i)
+	{
+		nodes.emplace_back(prevLayer);
+	}
+
 }
 
 
