@@ -58,6 +58,11 @@ nnet::neural* nnet::neural::makeCopy ()
 	return makeCopy_m(true);
 }
 
+nnet::neural* nnet::neural::split ()
+{
+	return makeCopy_m(false);
+}
+
 nnet::neural* nnet::neural::makeCopy_m (bool copyWeights)
 {
 

@@ -20,7 +20,6 @@ namespace nnet
 
 
 	struct layer;
-	class population;
 
 	class neural
 	{
