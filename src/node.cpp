@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <iostream>
+
 nnet::node::node (std::weak_ptr<layer> _prevLayer)
 : prevLayer {_prevLayer}
 {
@@ -13,6 +15,7 @@ nnet::node::node (std::weak_ptr<layer> _prevLayer)
 		const int count = prevLayerLock->nodes.size();
 
 		weights = std::make_shared<std::vector<float>>(count);
+		//weights = std::vector<float>(count);
 		weightNudgeSums = std::vector<float>(count, 0);
 
 		if (!weights)
