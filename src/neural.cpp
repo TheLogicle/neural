@@ -217,12 +217,14 @@ float nnet::neural::cost (std::vector<float> ideal)
 
 void nnet::neural::clearInput (float value)
 {
-
 	for (node &n: inputLayer->nodes)
-	{
 		n.value = value;
-	}
+}
 
+void nnet::neural::setInput (const std::vector<float> &input)
+{
+	for (size_t i = 0; i < inputLayer->nodes.size(); ++i)
+		inputLayer->nodes[i].value = input.at(i);
 }
 
 

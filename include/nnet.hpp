@@ -82,6 +82,9 @@ namespace nnet
 			// set all input nodes to value
 			void clearInput (float value);
 
+			// set values of input nodes
+			void setInput (const std::vector<float> &input);
+
 
 			// either of these selectOutput() functions should be run AFTER calculate()
 
